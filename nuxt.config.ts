@@ -1,14 +1,6 @@
 export default defineNuxtConfig({
   devtools: { enabled: false },
   modules: ["vuetify-nuxt-module"],
-  plugins: [
-    "~/plugins/firebase.ts", // プラグインのパスを設定
-  ],
-  nitro: {
-    firebase: {
-      gen: 2,
-    },
-  },
   runtimeConfig: {
     public: {
       googleMapsApiKey: process.env.NUXT_PUBLIC_GOOGLE_MAPS_API_KEY,
