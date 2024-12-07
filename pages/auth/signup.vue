@@ -32,48 +32,47 @@
   </v-container>
 </template>
 
-<script setup>
-import { ref } from "vue";
-import {
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-} from "firebase/auth";
-import { extractIdentifiers } from "vue/compiler-sfc";
-
-definePageMeta({
-  layout: "empty",
-});
-
-// Nuxtアプリから提供されたauthを取得
-const { $auth } = useNuxtApp();
-
-const email = ref("");
-const password = ref("");
-
-const signup = async () => {
-  try {
-    // ユーザーの作成
-    const userCredential = await createUserWithEmailAndPassword(
-      $auth,
-      email.value,
-      password.value
-    );
-    const user = userCredential.user;
-
-    // メール認証を送信
-    await sendEmailVerification(user);
-
-    // メール送信後、確認画面にリダイレクト
-    alert("認証メールを送信しました。メールを確認してください。");
-    navigateTo("/auth/verify");
-    return false;
-  } catch (error) {
-    console.error("アカウント作成エラー:");
-    alert("アカウント作成に失敗しました。エラー: ");
-  }
-};
-
-const goToLogin = () => {
-  navigateTo("/auth");
-};
-</script>
+   <script setup>
+   import { ref } from "vue";
+   import {
+     createUserWithEmailAndPassword,
+     sendEmailVerification,
+   } from "firebase/auth";
+   
+   definePageMeta({
+     layout: "empty",
+   });
+   
+   // Nuxtアプリから提供されたauthを取得
+   const { $auth } = useNuxtApp();
+   
+   const email = ref("");
+   const password = ref("");
+   
+   const signup = async () => {
+     try {
+       // ユーザーの作成
+       const userCredential = await createUserWithEmailAndPassword(
+         $auth,
+         email.value,
+         password.value
+       );
+       const user = userCredential.user;
+       
+       // メール認証を送信
+       await sendEmailVerification(user);
+       
+       // メール送信後、確認画面にリダイレクト
+       alert("認証メールを送信しました。メールを確認してください。");
+       navigateTo("/auth/verify");
+       return false;
+     } catch (error) {
+       console.error("アカウント作成エラー:", error.message);
+       alert("アカウント作成に失敗しました。エラー: ");
+     }
+   };
+   
+   const goToLogin = () => {
+     navigateTo("/auth");
+   };
+   </script>

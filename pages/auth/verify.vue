@@ -20,32 +20,32 @@
   </v-container>
 </template>
 
-<script setup>
-import { sendEmailVerification } from "firebase/auth";
-
-definePageMeta({
-  layout: "empty",
-});
-
-// Nuxtアプリから提供されたauthを取得
-const { $auth } = useNuxtApp();
-
-const resendVerificationEmail = async () => {
-  try {
-    const user = $auth.currentUser;
-    if (user) {
-      await sendEmailVerification(user);
-      alert("認証メールを再送信しました。メールを確認してください。");
-    } else {
-      alert("ユーザー情報が取得できませんでした。ログインし直してください。");
-    }
-  } catch (error) {
-    console.error("認証メール再送エラー:", error.message);
-    alert("認証メールの再送信に失敗しました。");
-  }
-};
-
-const goToLogin = () => {
-  navigateTo("/auth");
-};
-</script>
+   <script setup>
+   import { sendEmailVerification } from "firebase/auth";
+   
+   definePageMeta({
+     layout: "empty",
+   });
+   
+   // Nuxtアプリから提供されたauthを取得
+   const { $auth } = useNuxtApp();
+   
+   const resendVerificationEmail = async () => {
+     try {
+       const user = $auth.currentUser;
+       if (user) {
+         await sendEmailVerification(user);
+         alert("認証メールを再送信しました。メールを確認してください。");
+       } else {
+         alert("ユーザー情報が取得できませんでした。ログインし直してください。");
+       }
+     } catch (error) {
+       console.error("認証メール再送エラー:", error.message);
+       alert("認証メールの再送信に失敗しました。");
+     }
+   };
+   
+   const goToLogin = () => {
+     navigateTo("/auth");
+   };
+   </script>
