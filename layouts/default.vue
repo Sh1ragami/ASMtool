@@ -1,9 +1,7 @@
 <template>
   <v-layout>
     <v-navigation-drawer v-model="drawer">
-      <h1 style="margin: 3vh 7vh; font-weight: bold; overflow-wrap: break-word">
-        ASMツール
-      </h1>
+      <div class="text-h4 mb-5 mt-5 text-center">ASMツール</div>
       <v-list density="compact" item-props :items="items" nav />
 
       <template #append>
@@ -49,7 +47,7 @@
     </v-app-bar>
 
     <v-main>
-      <div class="pa-4">
+      <div class="pa-5">
         <!-- ここにメインコンテンツを埋め込む -->
         <slot />
       </div>
