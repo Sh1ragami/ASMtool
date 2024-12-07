@@ -1,0 +1,11 @@
+{
+  "functions": { "source": ".output/server" },
+  "hosting": [
+    {
+      "site": "asmtool-694e4",
+      "public": ".output/public",
+      "cleanUrls": true,
+      "rewrites": [{ "source": "**", "function": "server" }]
+    }
+  ]
+}
