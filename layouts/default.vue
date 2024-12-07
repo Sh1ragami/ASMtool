@@ -41,7 +41,7 @@
                 title="ユーザー情報"
               />
 
-              <v-list-item append-icon="mdi-logout" link title="Logout" />
+              <v-list-item append-icon="mdi-logout" @click="logout" title="ログアウト" />
             </v-list>
           </v-menu>
         </v-btn>
@@ -61,6 +61,21 @@
 import { ref } from "vue";
 import { computed } from "vue";
 import { useRoute } from "vue-router";
+import { signOut } from "firebase/auth";
+
+// プラグインからauthを取得
+const { $auth } = useNuxtApp();
+
+const logout = async () => {
+  try {
+    await signOut($auth);  // FirebaseのsignOutを使用してログアウト
+    console.log("ログアウトしました");
+    await navigateTo("/auth");  // ログアウト後、ログインページにリダイレクト
+  } catch (error) {
+    console.error("ログアウトエラー:", error.message);
+    alert("ログアウトに失敗しました");
+  }
+};
 
 // 現在のルート情報を取得
 const route = useRoute();
@@ -68,12 +83,12 @@ const route = useRoute();
 // ページごとのタイトル設定
 const appBarTitle = computed(() => {
   const pageTitles = {
-      "/dashboard": "ダッシュボード",
+    "/dashboard": "ダッシュボード",
     "/asset": "資産一覧",
     "/settings": "設定",
     "/settings/scan": "スキャン設定",
-      "/guide": "使い方",
-      "/vulnerabilities": "脆弱性一覧"
+    "/guide": "使い方",
+    "/vulnerabilities": "脆弱性一覧",
   };
   return pageTitles[route.path] || "デフォルトタイトル";
 });
