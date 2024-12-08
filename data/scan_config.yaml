@@ -1,0 +1,105 @@
+description: 攻撃面の発見方法や対象についての設定ファイル
+
+# 調査対象のドメイン名、IPアドレスなど
+target:
+  - asojuku.ac.jp
+
+include:
+  - subdomain-enum
+
+flags:
+  - safe
+  - passive
+
+modules:
+
+config:
+
+  modules:
+  
+    # APIキー設定
+# ---------------------------------------------------------------------------------------
+
+    bevigil:
+      # BevigilのAPIキー
+      api_key: 
+
+    binaryedge:
+      # BinaryEdgeのAPIキー
+      api_key: 
+
+    bufferoverrun:
+      # BufferoverrunのAPIキー
+      api_key: 
+
+    builtwith:
+      # BuiltWithのAPIキー
+      api_key: 
+
+    c99:
+      # c99のAPIキー
+      c99: 
+
+    censys:
+      # CensysのAPIキー
+      api_key: 
+
+    chaos:
+      # ChaosのAPIキー
+      api_key: 
+
+    credshed:
+      # CredshedのAPIキー
+      api_key: 
+
+    dehashed:
+      # DehashedのAPIキー
+      api_key: 
+
+    fullhunt:
+      # FullHuntのAPIキー
+      api_key: 
+
+    github_codesearch:
+      # GitHub Code SearchのAPIキー
+      api_key: 
+
+    hunterio:
+      # Hunter.ioのAPIキー
+      api_key: 
+
+    ip2location:
+      # IP2LocationのAPIキー
+      api_key: 
+
+    ipstack:
+      # IPStackのAPIキー
+      api_key: 
+
+    passivetotal:
+      # PassiveTotalのAPIキー
+      api_key: 
+
+    securitytrails:
+      # securitytrailsのAPIキー
+      api_key: 
+
+    shodan_dns:
+      # Shodan DNSのAPIキー
+      api_key: 
+
+    subdomainradar:
+      # SubdomainRadarのAPIキー
+      api_key: 
+
+    trickest:
+      # TrickestのAPIキー
+      api_key: 
+
+    virustotal:
+      # virustotalのAPIキー
+      api_key: 
+
+    zoomeye:
+      # ZoomeyeのAPIキー
+      api_key: 
