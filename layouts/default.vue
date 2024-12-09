@@ -83,13 +83,14 @@
 </template>
 
 <script setup>
-import { useRoute } from "vue-router";
 import { signOut } from "firebase/auth";
 import axios from "axios";
+import { useRoute } from "vue-router";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { ref, computed, onMounted } from "vue";
 import { useRuntimeConfig, useNuxtApp } from "#app";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+import yaml from 'js-yaml';
 
 // Firestoreの参照を取得
 const { $db } = useNuxtApp();
@@ -117,6 +118,7 @@ const categorizedResults = computed(() => {
 });
 
 const user = ref(null);
+const yamlData = ref(null); // Firestoreから取得したYAMLデータを保持
 
 // ユーザー認証の状態を監視
 onMounted(() => {
@@ -125,13 +127,28 @@ onMounted(() => {
   });
 });
 
-// スキャン結果をFirestoreに保存
+// スキャン結果を送信する関数
 async function submitScan() {
   loading.value = true;
   error.value = null;
 
   try {
-    const response = await axios.post(`${apiBaseURL}/run-bbot`);
+    // FirestoreからYAMLデータを取得
+    if (user.value) {
+      const yamlFromFirestore = await getFirestoreData(user.value.uid); // UIDに基づいてFirestoreからデータ取得
+      if (!yamlFromFirestore) {
+        throw new Error("YAMLデータがFirestoreに存在しません");
+      }
+
+      // YAMLデータを適切な形式に変換
+      yamlData.value = yaml.dump(yamlFromFirestore);
+    }
+
+    // APIリクエストにYAMLデータを含めて送信
+    const response = await axios.post(`${apiBaseURL}/run-bbot`, {
+      yaml: yamlData.value, // APIが期待するフィールド名に合わせて送信
+    });
+
     result.value = response.data.result;
 
     // Firestoreに結果を保存
@@ -140,18 +157,210 @@ async function submitScan() {
       await setDoc(userResultsRef, { results: result.value }, { merge: true });
       console.log("結果をFirestoreに保存しました");
     }
-  } catch (error) {
-    console.error("APIエラー:", error);
-    error.value = `エラーが発生しました: ${error.message}`;
+  } catch (err) {
+    console.error("APIエラー:", err);
+    error.value = `エラーが発生しました: ${err.message}`;
+
+    if (err.response) {
+      console.error("サーバーからの応答がありました:", err.response.data);
+      // サーバー側からのエラー応答をUIに表示するなど処理
+      error.value = `サーバーエラー: ${err.response.data.error || err.response.data.message}`;
+    }
   } finally {
     loading.value = false;
+  }
+} 
+
+// FirestoreからYAMLデータを取得する関数
+async function getFirestoreData(uid) {
+  try {
+    const docRef = doc($db, "yamls", uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return docSnap.data().results; // Firestoreのドキュメントフィールド名に基づく
+    } else {
+      console.log("指定されたUIDのデータが見つかりません");
+      return null;
+    }
+  } catch (error) {
+    console.error("Firestoreデータの取得に失敗しました:", error);
+    throw error;
+  }
+}
+
+
+// 初期のYAMLデータをFirestoreに保存
+async function saveInitialYaml(uid) {
+  try {
+    const initialYaml = `
+    flags:
+  - safe
+  - passive
+excavate: true
+interactsh_token: null
+folder_blobs: false
+aggregate: true
+engine:
+  debug: false
+cloudcheck: true
+interactsh_disable: false
+url_extension_httpx_only:
+  - js
+include:
+  - subdomain-enum
+scope:
+  search_distance: 0
+  strict: false
+  report_distance: 0
+web:
+  user_agent: >-
+    Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+    Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.2151.97
+  http_max_redirects: 5
+  ssl_verify: false
+  httpx_retries: 1
+  spider_distance: 0
+  http_proxy: null
+  http_headers: {}
+  httpx_timeout: 5
+  http_timeout: 10
+  spider_depth: 1
+  debug: false
+  spider_links_per_page: 25
+  http_retries: 1
+target:
+  - asojuku.ac.jp
+dns:
+  wildcard_tests: 10
+  retries: 1
+  abort_threshold: 50
+  wildcard_ignore: []
+  minimal: false
+  wildcard_disable: false
+  brute_nameservers: >-
+    https://raw.githubusercontent.com/blacklanternsecurity/public-dns-servers/master/nameservers.txt
+  search_distance: 1
+  timeout: 5
+  omit_queries:
+    - SRV:mail.protection.outlook.com
+    - CNAME:mail.protection.outlook.com
+    - TXT:mail.protection.outlook.com
+  brute_threads: 1000
+  filter_ptrs: true
+  debug: false
+  runaway_limit: 5
+  threads: 25
+url_extension_blacklist:
+  - png
+  - jpg
+  - bmp
+  - ico
+  - jpeg
+  - gif
+  - svg
+  - webp
+  - css
+  - woff
+  - woff2
+  - ttf
+  - eot
+  - sass
+  - scss
+  - mp3
+  - m4a
+  - wav
+  - flac
+  - mp4
+  - mkv
+  - avi
+  - wmv
+  - mov
+  - flv
+  - webm
+config:
+  modules:
+    censys:
+      api_key: null
+    chaos:
+      api_key: null
+    subdomainradar:
+      api_key: null
+    c99:
+      c99: null
+    github_codesearch:
+      api_key: null
+    bufferoverrun:
+      api_key: null
+    fullhunt:
+      api_key: null
+    dehashed:
+      api_key: null
+    zoomeye:
+      api_key: null
+    binaryedge:
+      api_key: null
+    trickest:
+      api_key: null
+    virustotal:
+      api_key: null
+    bevigil:
+      api_key: null
+    credshed:
+      api_key: null
+    securitytrails:
+      api_key: null
+    builtwith:
+      api_key: null
+    passivetotal:
+      api_key: null
+    ip2location:
+      api_key: null
+    shodan_dns:
+      api_key: null
+    hunterio:
+      api_key: null
+    ipstack:
+      api_key: null
+keep_scans: 20
+speculate: true
+home: ~/.bbot
+status_frequency: 15
+deps:
+  ffuf:
+    version: 2.1.0
+  behavior: abort_on_failure
+url_querystring_remove: true
+url_querystring_collapse: true
+omit_event_types:
+  - HTTP_RESPONSE
+  - RAW_TEXT
+  - URL_UNVERIFIED
+  - DNS_NAME_UNRESOLVED
+  - FILESYSTEM
+  - WEB_PARAMETER
+  - RAW_DNS_RECORD
+file_blobs: false
+interactsh_server: null
+module_dirs: []
+modules: null
+description: 攻撃面の発見方法や対象についての設定ファイル
+    `;
+    const parsedYaml = yaml.load(initialYaml);
+    const userResultsRef = doc($db, "yamls", uid);
+    await setDoc(userResultsRef, { results: parsedYaml }, { merge: true });
+    console.log("初期のYAMLがFirestoreに保存されました");
+    yamlData.value = parsedYaml;
+    yamlRaw.value = initialYaml;
+  } catch (error) {
+    console.error("Firestoreへの初期YAML保存に失敗しました:", error);
   }
 }
 
 // ログアウト機能
 const logout = async () => {
   try {
-    await signOut($auth);
+    await signOut(auth);
     console.log("ログアウトしました");
     await navigateTo("/auth");
   } catch (error) {
