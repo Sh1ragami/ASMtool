@@ -5,6 +5,19 @@
       <div class="text-h4 mb-5 mt-5 text-center">ASMツール</div>
       <v-list density="compact" item-props :items="items" nav />
 
+      <v-form @submit.prevent="submitScan">
+        <v-btn
+          type="submit"
+          color="primary"
+          :loading="loading"
+          class="ma-4"
+          elevation="10"
+          large
+        >
+          <v-icon left>mdi-run</v-icon>実行
+        </v-btn>
+      </v-form>
+
       <template #append>
         <v-list-item
           class="ma-2"
@@ -30,7 +43,9 @@
       <template #append>
         <!-- ダークモード切り替えボタン -->
         <v-btn icon class="me-2" @click="toggleTheme">
-          <v-icon>{{ isDarkMode ? 'mdi-weather-sunny' : 'mdi-moon-waning-crescent' }}</v-icon>
+          <v-icon>{{
+            isDarkMode ? "mdi-weather-sunny" : "mdi-moon-waning-crescent"
+          }}</v-icon>
         </v-btn>
 
         <!-- ユーザーメニュー -->
@@ -68,12 +83,70 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import { signOut } from "firebase/auth";
+import axios from "axios";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { ref, computed, onMounted } from "vue";
+import { useRuntimeConfig, useNuxtApp } from "#app";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
-// プラグインからauthを取得
-const { $auth } = useNuxtApp();
+// Firestoreの参照を取得
+const { $db } = useNuxtApp();
+const auth = getAuth();
+const result = ref(null);
+const activeTab = ref(0);
+const error = ref(null);
+const loading = ref(false);
+
+const apiBaseURL = useRuntimeConfig().public.apiBaseUrl || "";
+
+const tableHeaders = [{ text: "メッセージ", align: "start", key: "message" }];
+const categorizedResults = computed(() => {
+  if (!result.value) return {};
+  const categories = {};
+  result.value.forEach((entry) => {
+    const match = entry.message.match(/^\[(.+?)\]/);
+    if (match) {
+      const category = match[1];
+      if (!categories[category]) categories[category] = [];
+      categories[category].push(entry.message);
+    }
+  });
+  return categories;
+});
+
+const user = ref(null);
+
+// ユーザー認証の状態を監視
+onMounted(() => {
+  onAuthStateChanged(auth, async (currentUser) => {
+    user.value = currentUser; // ユーザーがサインインしている場合にユーザー情報をセット
+  });
+});
+
+// スキャン結果をFirestoreに保存
+async function submitScan() {
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const response = await axios.post(`${apiBaseURL}/run-bbot`);
+    result.value = response.data.result;
+
+    // Firestoreに結果を保存
+    if (user.value && result.value) {
+      const userResultsRef = doc($db, "users", user.value.uid);
+      await setDoc(userResultsRef, { results: result.value }, { merge: true });
+      console.log("結果をFirestoreに保存しました");
+    }
+  } catch (error) {
+    console.error("APIエラー:", error);
+    error.value = `エラーが発生しました: ${error.message}`;
+  } finally {
+    loading.value = false;
+  }
+}
 
 // ログアウト機能
 const logout = async () => {

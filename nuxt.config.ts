@@ -10,6 +10,8 @@ export default defineNuxtConfig({
       messagingSenderId: process.env.NUXT_PUBLIC_MESSAGING_SENDER_ID,
       appId: process.env.NUXT_PUBLIC_APP_ID,
       measurementId: process.env.NUXT_PUBLIC_MEASUREMENT_ID,
+      apiBaseUrl: process.env.API_BASE_URL || "",
     },
   },
+  plugins: ["~/plugins/axios.ts"],
 });

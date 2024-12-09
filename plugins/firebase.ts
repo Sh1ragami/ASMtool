@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore"; // Firestoreのインポート
 
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig();
@@ -14,11 +15,16 @@ export default defineNuxtPlugin(() => {
     measurementId: config.public.measurementId,
   };
 
-  initializeApp(firebaseConfig);
+  // Firebaseの初期化
+  const app = initializeApp(firebaseConfig);
+
+  // Firestoreインスタンスの作成
+  const db = getFirestore(app);
 
   return {
     provide: {
-      auth: getAuth(),
+      auth: getAuth(app), // Authインスタンスの提供
+      db, // Firestoreインスタンスの提供
     },
   };
 });
