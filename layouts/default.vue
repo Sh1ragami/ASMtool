@@ -2,7 +2,22 @@
   <v-layout>
     <!-- ナビゲーションドロワー -->
     <v-navigation-drawer v-model="drawer">
-      <div class="text-h4 mb-5 mt-5 text-center">Mon Deb Co</div>
+      <div class="mb-5 mt-5 text-center custom-font">
+        <div class="title-with-logo">
+          <img class="logo" src="../data/MDC_rogo.png" alt="Logo" />
+          <div>
+            <span class="M">M</span>
+            <span class="o">o</span>
+            <span class="n">n</span>
+            <span class="D">D</span>
+            <span class="e">e</span>
+            <span class="b">b</span>
+            <span class="C">C</span>
+            <span class="o">o</span>
+
+          </div>
+        </div>
+      </div>
       <v-list density="compact" item-props :items="items" nav />
 
       <v-form @submit.prevent="submitScan">
@@ -87,7 +102,7 @@ import { signOut } from "firebase/auth";
 import axios from "axios";
 import { useRoute } from "vue-router";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, defineEmits } from "vue";
 import { useRuntimeConfig, useNuxtApp } from "#app";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import yaml from 'js-yaml';
@@ -99,6 +114,11 @@ const result = ref(null);
 const activeTab = ref(0);
 const error = ref(null);
 const loading = ref(false);
+
+// 現在時刻を保存するための ref
+const currentTime = ref("");
+
+
 
 const apiBaseURL = useRuntimeConfig().public.apiBaseUrl || "";
 
@@ -131,7 +151,7 @@ onMounted(() => {
 async function submitScan() {
   loading.value = true;
   error.value = null;
-
+ 
   try {
     // FirestoreからYAMLデータを取得
     if (user.value) {
@@ -144,10 +164,24 @@ async function submitScan() {
       yamlData.value = yaml.dump(yamlFromFirestore);
     }
 
+        // ボタンクリック時に現在時刻を取得
+        const handleButtonClick = () => {
+      const now = new Date();
+      currentTime.value = now.toLocaleTimeString(); // 現在時刻を取得
+      console.log("現在時刻:", currentTime.value);
+
+      // 親コンポーネント（`dashboard.vue`）に通知する場合は、カスタムイベントや状態管理を使用
+      emit('updateCurrentTime', currentTime.value);
+    };
+
     // APIリクエストにYAMLデータを含めて送信
     const response = await axios.post(`${apiBaseURL}/run-bbot`, {
       yaml: yamlData.value, // APIが期待するフィールド名に合わせて送信
     });
+
+
+    // ボタンをクリックした後に現在時刻を更新
+    handleButtonClick();
 
     result.value = response.data.result;
 
@@ -158,18 +192,17 @@ async function submitScan() {
       console.log("結果をFirestoreに保存しました");
     }
   } catch (err) {
-    console.error("APIエラー:", err);
+    console.error("エラー:", err);
     error.value = `エラーが発生しました: ${err.message}`;
 
     if (err.response) {
       console.error("サーバーからの応答がありました:", err.response.data);
-      // サーバー側からのエラー応答をUIに表示するなど処理
       error.value = `サーバーエラー: ${err.response.data.error || err.response.data.message}`;
     }
   } finally {
     loading.value = false;
   }
-} 
+}
 
 // FirestoreからYAMLデータを取得する関数
 async function getFirestoreData(uid) {
@@ -434,6 +467,41 @@ const toggleTheme = () => {
 <style scoped>
 .v-avatar {
   cursor: pointer;
+}
+/* フォント変更 */
+.custom-font {
+  font-weight: bold; /* 太字 */
+  align-items: center;
+  font-family: Georgia, serif;
+  font-size: 2.2vw;
+}
+
+.o{
+  color: #737373;
+}
+
+.n{
+  color: #737373;
+  margin-right: 1vw;
+}
+
+.e{
+  color: #737373;
+}
+
+.b{
+  color: #737373;
+  margin-right: 1vw;
+}
+
+.logo{
+  height: 6.5vh;
+}
+
+.title-with-logo{
+  display: flex;
+  justify-content: start;
+  align-items: center;
 }
 
 </style>

@@ -6,7 +6,7 @@
       <!-- 現在時刻と年月日を横一列に表示 -->
       <div class="current-datetime">
         <span class="current-date" v-text="currentDate"></span>
-        <span class="current-time" v-text="currentTime"></span>
+        <div>{{ currentDateTime }}</div>
       </div>
 
       <v-row class="mb-2" align="center" justify="center" no-gutters>
@@ -160,7 +160,7 @@ onMounted(() => {
             ctx.fillText(score.value, width / 2, height / 2 + 0); // 少し下に配置
             // スコアの輪郭（ボーダー）
             ctx.strokeStyle = "rgba(0, 0, 0, 0.8)"; // 黒色の輪郭
-            ctx.lineWidth = 1; // ボーダーの太さ
+            ctx.lineWidth = 0.5; // ボーダーの太さ
             ctx.strokeText(score.value, width / 2, height / 2);
 
             // 深刻度ラベルの追加
@@ -189,7 +189,7 @@ onMounted(() => {
             ctx.fillText(severityTexts[index], width / 2, height / 2 + 50); // 下に配置
             // 深刻度ラベルの輪郭（ボーダー）
             ctx.strokeStyle = "rgba(0, 0, 0, 0.8)";
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 0.5;
             ctx.strokeText(severityTexts[index], width / 2, height / 2 + 50);
 
 
@@ -243,6 +243,12 @@ onMounted(() => {
   }, 1000);
 });
 
+// 親から渡された currentTime を更新
+const updateCurrentTime = (time) => {
+  currentTime.value = time;
+};
+
+
 // 四角形カードデータ
 const squareData = ref([
   { label: "緊急", value: 10, color: "#700D0D" },
@@ -286,6 +292,9 @@ onMounted(() => {
   }
 });
 </script>
+
+
+<default @updateCurrentTime="updateCurrentTime" />
 
 <style>
 /* 全体のスタイル */
