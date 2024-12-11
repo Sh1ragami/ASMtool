@@ -20,7 +20,7 @@ export default defineNuxtPlugin(() => {
 
   // Firestoreインスタンスの作成
   const db = getFirestore(app);
-
+  
   return {
     provide: {
       auth: getAuth(app), // Authインスタンスの提供

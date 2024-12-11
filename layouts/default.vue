@@ -19,7 +19,7 @@
         </div>
       </div>
       <v-list density="compact" item-props :items="items" nav />
-
+  
       <v-form @submit.prevent="submitScan">
         <v-btn
           type="submit"
@@ -32,7 +32,7 @@
           <v-icon left>mdi-run</v-icon>実行
         </v-btn>
       </v-form>
-
+      
       <template #append>
         <v-list-item
           class="ma-2"
@@ -114,11 +114,7 @@ const result = ref(null);
 const activeTab = ref(0);
 const error = ref(null);
 const loading = ref(false);
-
-// 現在時刻を保存するための ref
-const currentTime = ref("");
-
-
+const emit = defineEmits(["updateDateTime"]);
 
 const apiBaseURL = useRuntimeConfig().public.apiBaseUrl || "";
 
@@ -151,8 +147,20 @@ onMounted(() => {
 async function submitScan() {
   loading.value = true;
   error.value = null;
- 
+
   try {
+    // 現在時刻を保存
+    const now = new Date();
+    const currentTime = now.toLocaleTimeString();  // 現在時刻
+    const currentDate = now.toLocaleDateString();  // 現在日付（年月日）
+
+    // 現在時刻と現在日付をlocalStorageに保存
+    localStorage.setItem('savedTime', currentTime);
+    localStorage.setItem('savedDate', currentDate);
+    
+    console.log("現在時刻を保存しました:", currentTime);
+    console.log("現在日付を保存しました:", currentDate);
+
     // FirestoreからYAMLデータを取得
     if (user.value) {
       const yamlFromFirestore = await getFirestoreData(user.value.uid); // UIDに基づいてFirestoreからデータ取得
@@ -164,24 +172,10 @@ async function submitScan() {
       yamlData.value = yaml.dump(yamlFromFirestore);
     }
 
-        // ボタンクリック時に現在時刻を取得
-        const handleButtonClick = () => {
-      const now = new Date();
-      currentTime.value = now.toLocaleTimeString(); // 現在時刻を取得
-      console.log("現在時刻:", currentTime.value);
-
-      // 親コンポーネント（`dashboard.vue`）に通知する場合は、カスタムイベントや状態管理を使用
-      emit('updateCurrentTime', currentTime.value);
-    };
-
     // APIリクエストにYAMLデータを含めて送信
     const response = await axios.post(`${apiBaseURL}/run-bbot`, {
       yaml: yamlData.value, // APIが期待するフィールド名に合わせて送信
     });
-
-
-    // ボタンをクリックした後に現在時刻を更新
-    handleButtonClick();
 
     result.value = response.data.result;
 
@@ -201,6 +195,9 @@ async function submitScan() {
     }
   } finally {
     loading.value = false;
+
+    // ページリロード機能を追加
+    location.reload(); // これでページをリロードします
   }
 }
 
@@ -502,6 +499,7 @@ const toggleTheme = () => {
   display: flex;
   justify-content: start;
   align-items: center;
+  margin: 0.3vw;
 }
 
 </style>

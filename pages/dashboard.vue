@@ -5,8 +5,8 @@
       <div class="diagnosis" ml="10" align="center" justify="center" no-gutters>診断日</div>
       <!-- 現在時刻と年月日を横一列に表示 -->
       <div class="current-datetime">
-        <span class="current-date" v-text="currentDate"></span>
-        <div>{{ currentDateTime }}</div>
+        <span>{{ savedDate }}</span>
+        <span>{{ savedTime }}</span>
       </div>
 
       <v-row class="mb-2" align="center" justify="center" no-gutters>
@@ -232,22 +232,28 @@ onMounted(() => {
   getCveData();
 });
 
-// 現在時刻と年月日を表示するための ref
-const currentTime = ref("");
-const currentDate = ref("");
+const savedTime = ref('');
+
+const savedDate = ref('');
+
+// ページが読み込まれたときにlocalStorageから時刻を取得
 onMounted(() => {
-  setInterval(() => {
-    const now = new Date();
-    currentTime.value = now.toLocaleTimeString(); // 時刻を更新
-    currentDate.value = now.toLocaleDateString(); // 年月日を更新
-  }, 1000);
+  const time = localStorage.getItem('savedTime');
+  if (time) {
+    savedTime.value = time;
+  } else {
+    savedTime.value = '時刻が保存されていません';
+  }
 });
 
-// 親から渡された currentTime を更新
-const updateCurrentTime = (time) => {
-  currentTime.value = time;
-};
-
+onMounted(() => {
+  const date = localStorage.getItem('savedDate');
+  if (date) {
+    savedDate.value = date;
+  } else {
+    savedDate.value = '日付が保存されていません';
+  }
+});
 
 // 四角形カードデータ
 const squareData = ref([
@@ -375,4 +381,5 @@ onMounted(() => {
   font-weight: bold;
   margin-bottom: 2vh;
 }
+
 </style>
