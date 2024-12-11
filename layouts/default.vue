@@ -2,7 +2,7 @@
   <v-layout>
     <!-- ナビゲーションドロワー -->
     <v-navigation-drawer v-model="drawer">
-      <div class="text-h4 mb-5 mt-5 text-center">ASMツール</div>
+      <div class="text-h4 mb-5 mt-5 text-center">Mon Deb Co</div>
       <v-list density="compact" item-props :items="items" nav />
 
       <v-form @submit.prevent="submitScan">
@@ -375,7 +375,7 @@ const route = useRoute();
 // ページタイトルを動的に設定
 const appBarTitle = computed(() => {
   const pageTitles = {
-    "/dashboard": "ダッシュボード",
+    "/dashboard": "診断結果",
     "/asset": "資産一覧",
     "/settings": "設定",
     "/settings/scan": "スキャン設定",
@@ -435,4 +435,5 @@ const toggleTheme = () => {
 .v-avatar {
   cursor: pointer;
 }
+
 </style>

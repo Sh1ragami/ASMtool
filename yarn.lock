@@ -316,6 +316,16 @@
     "@codemirror/view" "^0.20.0"
     "@lezer/common" "^0.16.0"
 
+"@codemirror/commands@^6.0.0":
+  version "6.7.1"
+  resolved "https://registry.npmjs.org/@codemirror/commands/-/commands-6.7.1.tgz"
+  integrity sha512-llTrboQYw5H4THfhN4U3qCnSZ1SOJ60ohhz+SzU0ADGtwlc533DtklQP0vSFaQuCPDn3BPpOd1GbbnUtwNjsrw==
+  dependencies:
+    "@codemirror/language" "^6.0.0"
+    "@codemirror/state" "^6.4.0"
+    "@codemirror/view" "^6.27.0"
+    "@lezer/common" "^1.1.0"
+
 "@codemirror/commands@6.x":
   version "6.7.1"
   resolved "https://registry.npmjs.org/@codemirror/commands/-/commands-6.7.1.tgz"
@@ -371,6 +381,15 @@
     "@codemirror/view" "^0.20.2"
     crelt "^1.0.5"
 
+"@codemirror/lint@^6.0.0":
+  version "6.8.4"
+  resolved "https://registry.npmjs.org/@codemirror/lint/-/lint-6.8.4.tgz"
+  integrity sha512-u4q7PnZlJUojeRe8FJa/njJcMctISGgPQ4PnWsd9268R4ZTtU+tfFYmwkBvgcrK2+QQ8tYFVALVb5fVJykKc5A==
+  dependencies:
+    "@codemirror/state" "^6.0.0"
+    "@codemirror/view" "^6.35.0"
+    crelt "^1.0.5"
+
 "@codemirror/search@^0.20.0":
   version "0.20.1"
   resolved "https://registry.npmjs.org/@codemirror/search/-/search-0.20.1.tgz"
@@ -378,6 +397,15 @@
   dependencies:
     "@codemirror/state" "^0.20.0"
     "@codemirror/view" "^0.20.0"
+    crelt "^1.0.5"
+
+"@codemirror/search@^6.0.0":
+  version "6.5.8"
+  resolved "https://registry.npmjs.org/@codemirror/search/-/search-6.5.8.tgz"
+  integrity sha512-PoWtZvo7c1XFeZWmmyaOp2G0XVbOnm+fJzvghqGAktBW3cufwJUWvSCcNG0ppXiBEM05mZu6RhMtXPv2hpllig==
+  dependencies:
+    "@codemirror/state" "^6.0.0"
+    "@codemirror/view" "^6.0.0"
     crelt "^1.0.5"
 
 "@codemirror/state@^0.20.0":
@@ -418,7 +446,7 @@
     style-mod "^4.0.0"
     w3c-keyname "^2.2.4"
 
-"@codemirror/view@^6.0.0", "@codemirror/view@^6.17.0", "@codemirror/view@^6.23.0", "@codemirror/view@^6.27.0", "@codemirror/view@^6.35.2", "@codemirror/view@6.x":
+"@codemirror/view@^6.0.0", "@codemirror/view@^6.17.0", "@codemirror/view@^6.23.0", "@codemirror/view@^6.27.0", "@codemirror/view@^6.35.0", "@codemirror/view@^6.35.2", "@codemirror/view@6.x":
   version "6.35.2"
   resolved "https://registry.npmjs.org/@codemirror/view/-/view-6.35.2.tgz"
   integrity sha512-u04R04XFCYCNaHoNRr37WUUAfnxKPwPdqV+370NiO6i85qB1J/qCD/WbbMJsyJfRWhXIJXAe2BG/oTzAggqv4A==
@@ -2134,10 +2162,18 @@ cluster-key-slot@^1.1.0:
   resolved "https://registry.npmjs.org/cluster-key-slot/-/cluster-key-slot-1.1.2.tgz"
   integrity sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==
 
-codemirror@^5.59.4, codemirror@6.x:
-  version "5.59.4"
-  resolved "https://registry.npmjs.org/codemirror/-/codemirror-5.59.4.tgz"
-  integrity sha512-achw5JBgx8QPcACDDn+EUUXmCYzx/zxEtOGXyjvLEvYY8GleUrnfm5D+Zb+UjShHggXKDT9AXrbkBZX6a0YSQg==
+codemirror@^6.0.1, codemirror@6.x:
+  version "6.0.1"
+  resolved "https://registry.npmjs.org/codemirror/-/codemirror-6.0.1.tgz"
+  integrity sha512-J8j+nZ+CdWmIeFIGXEFbFPtpiYacFMDR8GlHK3IyHQJMCaVRfGx9NT+Hxivv1ckLWPvNdZqndbr/7lVhrf/Svg==
+  dependencies:
+    "@codemirror/autocomplete" "^6.0.0"
+    "@codemirror/commands" "^6.0.0"
+    "@codemirror/language" "^6.0.0"
+    "@codemirror/lint" "^6.0.0"
+    "@codemirror/search" "^6.0.0"
+    "@codemirror/state" "^6.0.0"
+    "@codemirror/view" "^6.0.0"
 
 color-convert@^2.0.1:
   version "2.0.1"
