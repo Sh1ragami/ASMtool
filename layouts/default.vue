@@ -1,8 +1,21 @@
 <template>
   <v-layout>
-    <!-- ナビゲーションドロワー -->
     <v-navigation-drawer v-model="drawer">
-      <div class="text-h4 mb-5 mt-5 text-center">ASMツール</div>
+      <div class="mb-5 mt-5 text-center custom-font">
+        <div class="title-with-logo">
+          <img class="logo" src="../data/MDC_rogo.png" alt="Logo" />
+          <div>
+            <span class="M">M</span>
+            <span class="o">o</span>
+            <span class="n">n</span>
+            <span class="D">D</span>
+            <span class="e">e</span>
+            <span class="b">b</span>
+            <span class="C">C</span>
+            <span class="o">o</span>
+          </div>
+        </div>
+      </div>
       <v-list density="compact" item-props :items="items" nav />
 
       <v-form @submit.prevent="submitScan">
@@ -90,7 +103,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { ref, computed, onMounted } from "vue";
 import { useRuntimeConfig, useNuxtApp } from "#app";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import yaml from 'js-yaml';
+import yaml from "js-yaml";
 
 // Firestoreの参照を取得
 const { $db } = useNuxtApp();
@@ -128,11 +141,24 @@ onMounted(() => {
 });
 
 // スキャン結果を送信する関数
+// スキャン結果を送信する関数
 async function submitScan() {
   loading.value = true;
   error.value = null;
 
   try {
+    // 現在時刻を保存
+    const now = new Date();
+    const currentTime = now.toLocaleTimeString(); // 現在時刻
+    const currentDate = now.toLocaleDateString(); // 現在日付（年月日）
+
+    // 現在時刻と現在日付をlocalStorageに保存
+    localStorage.setItem("savedTime", currentTime);
+    localStorage.setItem("savedDate", currentDate);
+
+    console.log("現在時刻を保存しました:", currentTime);
+    console.log("現在日付を保存しました:", currentDate);
+
     // FirestoreからYAMLデータを取得
     if (user.value) {
       const yamlFromFirestore = await getFirestoreData(user.value.uid); // UIDに基づいてFirestoreからデータ取得
@@ -158,18 +184,21 @@ async function submitScan() {
       console.log("結果をFirestoreに保存しました");
     }
   } catch (err) {
-    console.error("APIエラー:", err);
+    console.error("エラー:", err);
     error.value = `エラーが発生しました: ${err.message}`;
 
     if (err.response) {
       console.error("サーバーからの応答がありました:", err.response.data);
-      // サーバー側からのエラー応答をUIに表示するなど処理
-      error.value = `サーバーエラー: ${err.response.data.error || err.response.data.message}`;
+      error.value = `サーバーエラー: ${
+        err.response.data.error || err.response.data.message
+      }`;
     }
   } finally {
     loading.value = false;
+
+    // ページリロード機能を追加
   }
-} 
+}
 
 // FirestoreからYAMLデータを取得する関数
 async function getFirestoreData(uid) {
@@ -188,7 +217,6 @@ async function getFirestoreData(uid) {
     throw error;
   }
 }
-
 
 // 初期のYAMLデータをFirestoreに保存
 async function saveInitialYaml(uid) {
@@ -375,7 +403,7 @@ const route = useRoute();
 // ページタイトルを動的に設定
 const appBarTitle = computed(() => {
   const pageTitles = {
-    "/dashboard": "ダッシュボード",
+    "/dashboard": "診断結果",
     "/asset": "資産一覧",
     "/settings": "設定",
     "/settings/scan": "スキャン設定",
@@ -430,9 +458,45 @@ const toggleTheme = () => {
   vuetify.theme.global.name.value = isDarkMode.value ? "dark" : "light";
 };
 </script>
-
 <style scoped>
 .v-avatar {
   cursor: pointer;
+}
+/* フォント変更 */
+.custom-font {
+  font-weight: bold; /* 太字 */
+  align-items: center;
+  font-family: Georgia, serif;
+  font-size: 2.2vw;
+}
+
+.o {
+  color: #737373;
+}
+
+.n {
+  color: #737373;
+  margin-right: 1vw;
+}
+
+.e {
+  color: #737373;
+}
+
+.b {
+  color: #737373;
+  margin-right: 1vw;
+}
+
+.logo {
+  height: 6.5vh;
+}
+
+.title-with-logo {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  margin: 0.3vw;
+  font-size: 1.7vw;
 }
 </style>

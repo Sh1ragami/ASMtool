@@ -2,23 +2,32 @@
   <v-container fluid class="pa-1">
     <v-col class="relative">
       <!-- "診断日" を自由に動かせるように absolute positioning を設定 -->
-      <div class="diagnosis" ml="10" align="center" justify="center" no-gutters>診断日</div>
+      <div class="diagnosis" ml="10" align="center" justify="center" no-gutters>
+        診断日
+      </div>
       <!-- 現在時刻と年月日を横一列に表示 -->
       <div class="current-datetime">
-        <span class="current-date" v-text="currentDate"></span>
-        <span class="current-time" v-text="currentTime"></span>
+        <span>{{ savedDate }}</span>
+        <span>{{ savedTime }}</span>
       </div>
- 
+
       <v-row class="mb-2" align="center" justify="center" no-gutters>
         <!-- 円グラフ -->
         <v-col cols="12" md="3" class="circle">
           <div class="relative h-[40vh] w-[40vw] mx-auto">
-            <canvas ref="doughnutChart" style="width: 90%; height: 90%"></canvas>
+            <canvas
+              ref="doughnutChart"
+              style="width: 90%; height: 90%"
+            ></canvas>
           </div>
         </v-col>
- 
+
         <!-- 四角形カード -->
-        <v-col v-for="(item, index) in squareData" :key="index" style="margin-top: 10vh;">
+        <v-col
+          v-for="(item, index) in squareData"
+          :key="index"
+          style="margin-top: 10vh"
+        >
           <v-card
             class="d-flex flex-column justify-center align-center text-center shadow-sm"
             :style="{
@@ -44,18 +53,22 @@
           </v-card>
         </v-col>
       </v-row>
- 
+
       <!-- 深刻度ラベル -->
       <v-row class="severity-row" align="start" justify="start" no-gutters>
         <div class="severity-text">
           <span>深刻度：</span>
         </div>
-        <div v-for="(label, index) in severityLabels" :key="index" class="severity-label">
+        <div
+          v-for="(label, index) in severityLabels"
+          :key="index"
+          class="severity-label"
+        >
           <span :style="{ color: label.color }">{{ label.text }}</span>
         </div>
       </v-row>
     </v-col>
- 
+
     <!-- 棒グラフ -->
     <v-row>
       <v-col cols="12">
@@ -73,7 +86,7 @@
     </v-row>
   </v-container>
 </template>
- 
+
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { Bar } from "vue-chartjs";
@@ -88,7 +101,7 @@ import {
   DoughnutController,
   ArcElement,
 } from "chart.js";
- 
+
 // Chart.js の登録
 ChartJS.register(
   Title,
@@ -100,15 +113,15 @@ ChartJS.register(
   DoughnutController,
   ArcElement
 );
- 
+
 // Firestoreデータを受け取るプロパティ
 const { result } = defineProps();
- 
+
 // 円グラフデータとスコア
 const doughnutChart = ref(null);
 const score = ref("A"); // 初期スコア
 const scoreColor = ref("#700D0D"); // 初期スコアの色
- 
+
 onMounted(() => {
   if (doughnutChart.value) {
     const ctx = doughnutChart.value.getContext("2d");
@@ -144,7 +157,7 @@ onMounted(() => {
           id: "customTextPlugin",
           beforeDraw(chart) {
             const { width, height, ctx } = chart;
- 
+
             // 中央テキスト1: LEVEL
             ctx.save();
             ctx.font = "italic bold 30px Arial"; // 斜体 + 太字
@@ -153,16 +166,16 @@ onMounted(() => {
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText("LEVEL", width / 2, height / 2 - 60); // 上部に配置
- 
+
             // 中央テキスト2: 動的なスコア (CVSSスコアに基づく)
             ctx.font = "bold 5vw Arial";
             ctx.fillStyle = scoreColor.value; // 動的に変わる色
             ctx.fillText(score.value, width / 2, height / 2 + 0); // 少し下に配置
             // スコアの輪郭（ボーダー）
             ctx.strokeStyle = "rgba(0, 0, 0, 0.8)"; // 黒色の輪郭
-            ctx.lineWidth = 1; // ボーダーの太さ
+            ctx.lineWidth = 0.5; // ボーダーの太さ
             ctx.strokeText(score.value, width / 2, height / 2);
- 
+
             // 深刻度ラベルの追加
             const severityTexts = ["緊急", "重要", "警告", "注意", "なし"];
             const severityColors = [
@@ -172,7 +185,7 @@ onMounted(() => {
               "#E0E29D", // 注意
               "#FFFFFF", // なし
             ];
-           
+
             const severityIndex = {
               A: 0, // 緊急
               B: 1, // 重要
@@ -180,19 +193,17 @@ onMounted(() => {
               D: 3, // 注意
               E: 4, // なし
             };
- 
+
             const index = severityIndex[score.value]; // スコアに基づくインデックス
- 
- 
+
             ctx.font = "bold 20px Arial";
             ctx.fillStyle = severityColors[index];
             ctx.fillText(severityTexts[index], width / 2, height / 2 + 50); // 下に配置
             // 深刻度ラベルの輪郭（ボーダー）
             ctx.strokeStyle = "rgba(0, 0, 0, 0.8)";
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 0.5;
             ctx.strokeText(severityTexts[index], width / 2, height / 2 + 50);
- 
- 
+
             ctx.restore();
           },
         },
@@ -200,13 +211,13 @@ onMounted(() => {
     });
   }
 });
- 
+
 // CVEデータを取得してCVSSスコアに基づき評価を決定
 const getCveData = async () => {
   // CVEデータの取得（仮の例）
-  const cveData = await fetch("/path/to/cve/data");  // データのパスを指定
+  const cveData = await fetch("/path/to/cve/data"); // データのパスを指定
   const data = await cveData.json();
- 
+
   // CVSSスコアに基づきスコアを決定
   const cvssScore = data.cvssScore; // CVEデータからスコアを取得
   if (cvssScore >= 9.0) {
@@ -226,32 +237,44 @@ const getCveData = async () => {
     scoreColor.value = "#FFFFFF"; // 白色
   }
 };
- 
+
 // CVEデータの取得と評価の更新
 onMounted(() => {
   getCveData();
 });
- 
-// 現在時刻と年月日を表示するための ref
-const currentTime = ref("");
-const currentDate = ref("");
+
+const savedTime = ref("");
+
+const savedDate = ref("");
+
+// ページが読み込まれたときにlocalStorageから時刻を取得
 onMounted(() => {
-  setInterval(() => {
-    const now = new Date();
-    currentTime.value = now.toLocaleTimeString(); // 時刻を更新
-    currentDate.value = now.toLocaleDateString(); // 年月日を更新
-  }, 1000);
+  const time = localStorage.getItem("savedTime");
+  if (time) {
+    savedTime.value = time;
+  } else {
+    savedTime.value = "時刻が保存されていません";
+  }
 });
- 
+
+onMounted(() => {
+  const date = localStorage.getItem("savedDate");
+  if (date) {
+    savedDate.value = date;
+  } else {
+    savedDate.value = "日付が保存されていません";
+  }
+});
+
 // 四角形カードデータ
 const squareData = ref([
-  { label: "緊急", value: 10, color: "#700D0D" },
-  { label: "重要", value: 20, color: "#4C7C84" },
-  { label: "警告", value: 30, color: "#749A7D" },
-  { label: "注意", value: 40, color: "#E0E29D" },
-  { label: "なし", value: 0, color: "#FFFFFF" },
+  { label: "緊急", value: 5, color: "#700D0D" },
+  { label: "重要", value: 12, color: "#4C7C84" },
+  { label: "警告", value: 3, color: "#749A7D" },
+  { label: "注意", value: 9, color: "#E0E29D" },
+  { label: "なし", value: 11, color: "#FFFFFF" },
 ]);
- 
+
 // 深刻度ラベルデータ
 const severityLabels = ref([
   { text: "緊急 (9.0~10.0)", color: "#700D0D" },
@@ -260,33 +283,48 @@ const severityLabels = ref([
   { text: "注意 (0.1~3.9)", color: "#E0E29D" },
   { text: "なし (0)", color: "#FFFFFF" },
 ]);
- 
+
 // 棒グラフのデータ設定
 const chartData = ref({
-  labels: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+  labels: [
+    "12/1",
+    "12/2",
+    "12/3",
+    "12/4",
+    "12/5",
+    "12/6",
+    "12/7",
+    "12/8",
+    "12/9",
+    "12/10",
+    "12/11",
+    "12/12",
+  ],
   datasets: [
     {
       label: "データ数",
       backgroundColor: "#42A5F5",
-      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      data: [0, 0, 45, 45, 45, 0, 45, 45, 46, 46, 43, 45],
     },
   ],
 });
- 
+
 // Firestoreデータの数を計算する
 const dataCount = computed(() => {
-  return result?.value?.length || 0;  // result が存在する場合のみ length を参照
+  return 45 || 0; // result が存在する場合のみ length を参照
 });
- 
+
 // Firestoreのデータを基に棒グラフのデータを更新
 onMounted(() => {
   if (result?.value) {
     // `result.value` が存在する場合のみ、棒グラフデータを更新
-    chartData.value.datasets[0].data = result.value.map(() => 1);  // 各月のデータ数を1として表示
+    chartData.value.datasets[0].data = result.value.map(() => 1); // 各月のデータ数を1として表示
   }
 });
 </script>
- 
+
+<default @updateCurrentTime="updateCurrentTime" />
+
 <style>
 /* 全体のスタイル */
 .relative {
@@ -301,21 +339,21 @@ onMounted(() => {
   bottom: 0;
   left: 0;
 }
- 
+
 .pa-5 {
-  background-color:#f4f5f7;
+  background-color: #f4f5f7;
 }
- 
+
 .mb-2 {
   display: flex;
 }
- 
+
 .circle {
   display: flex;
   justify-content: center;
   margin-right: 4vw;
 }
- 
+
 /* "診断日" を自由に動かせるように */
 .diagnosis {
   font-weight: bold;
@@ -324,7 +362,7 @@ onMounted(() => {
   left: 23vw; /* 中央に配置（適宜調整） */
   top: 7vh; /* 上から10vhの位置に配置（適宜調整） */
 }
- 
+
 /* 現在時刻と年月日を横一列に配置 */
 .current-datetime {
   display: flex;
@@ -337,30 +375,29 @@ onMounted(() => {
   left: 23vw;
   top: 10.4vh; /* "診断日" の下に配置（適宜調整） */
 }
- 
+
 .current-date,
 .current-time {
   font-size: 1.5vw;
   font-weight: bold;
   color: rgba(112, 13, 13, 0.8);
- 
 }
- 
+
 /* 深刻度ラベルを横一列に配置 */
 .severity-row {
   display: flex;
   justify-content: flex-start; /* 左揃え */
-  align-items: center;  /* 中央揃え（縦方向） */
+  align-items: center; /* 中央揃え（縦方向） */
   gap: 1vw; /* ラベル間の間隔 */
 }
- 
+
 .severity-label {
   font-size: 1vw;
   font-weight: bold;
   margin-bottom: 2vh;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2), 1px 1px 2px rgba(0, 0, 0, 0.3); /* 文字の周りに影を付けてボーダー風に */
 }
- 
+
 .severity-text {
   font-size: 1vw;
   font-weight: bold;
