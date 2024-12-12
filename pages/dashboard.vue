@@ -268,11 +268,11 @@ onMounted(() => {
 
 // 四角形カードデータ
 const squareData = ref([
-  { label: "緊急", value: 5, color: "#700D0D" },
-  { label: "重要", value: 12, color: "#4C7C84" },
+  { label: "緊急", value: 0, color: "#700D0D" },
+  { label: "重要", value: 1, color: "#4C7C84" },
   { label: "警告", value: 3, color: "#749A7D" },
-  { label: "注意", value: 9, color: "#E0E29D" },
-  { label: "なし", value: 11, color: "#FFFFFF" },
+  { label: "注意", value: 11, color: "#E0E29D" },
+  { label: "なし", value: 25, color: "#FFFFFF" },
 ]);
 
 // 深刻度ラベルデータ
@@ -338,10 +338,6 @@ onMounted(() => {
   right: 0;
   bottom: 0;
   left: 0;
-}
-
-.pa-5 {
-  background-color: #f4f5f7;
 }
 
 .mb-2 {
